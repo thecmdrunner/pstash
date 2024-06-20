@@ -2,12 +2,8 @@
   "name": "pstash",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
-  "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "build-lambda-pkg": "rm my-lambda-package.zip ; zip -r my-lambda-package.zip index.js src ffmpeg ffprobe node_modules package.json package-lock.json",
-    "build": "rm dist -rf && mkdir dist && tsc",
+    "build": "rm dist -rf && tsc",
     "deploy": "npm run build && serverless deploy"
   },
   "author": "",

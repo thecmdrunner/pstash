@@ -1,5 +1,13 @@
-import { DISCORD_WEBHOOK_URL } from "@/lib/constants";
-import { APIGatewayProxyResult, Callback, Context, SQSEvent } from "aws-lambda";
+import type {
+  APIGatewayProxyResult,
+  Callback,
+  Context,
+  SQSEvent,
+} from "aws-lambda";
+const DISCORD_WEBHOOK_URL =
+  // "https://discord.com/api/webhooks/1253350657864241246/SZRmeagS_yoD5Pw7E-eid5i-OPWJ2LPW1HZuOUygA6bxWbkfuw8IBpQo9DEgB7a6KwFH";
+
+  "https://discord.com/api/webhooks/1147482808126820383/Y31zfbdTUilSfRedOBvFXP9K-1Or6R_LMHush4utahxPJybc7OrvDprxgcO-kDn8RiUj";
 
 export const handler = async (
   event: SQSEvent,
@@ -15,10 +23,9 @@ export const handler = async (
       await sendLogToDiscord(messageBody);
     }
 
-    // return `Successfully processed ${event.Records.length} messages.`;
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Hello, world!" }),
+      body: JSON.stringify({ message: "Namaste, world!" }),
     };
   } catch (error) {
     console.error("Error processing SQS messages:", error);
@@ -26,7 +33,7 @@ export const handler = async (
   }
 };
 
-export const sendLogToDiscord = async (content: string) => {
+const sendLogToDiscord = async (content: string) => {
   try {
     const res = await fetch(DISCORD_WEBHOOK_URL, {
       method: "POST",
