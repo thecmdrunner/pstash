@@ -1,0 +1,60 @@
+service: pStash
+
+frameworkVersion: "3.39.0"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ap-south-1
+  reservedConcurrency: 10000 # Adjust as needed based on your traffic
+
+functions:
+  pstash:
+    name: pstash # Custom name for the Lambda function
+    handler: dist/index.handler
+    memorySize: 2048 # Increase the memory size (default is 128 MB)
+    timeout: 300 # Increase the timeout (default is 6 seconds, max is 900 seconds)
+    # environment:
+    #   MY_ENV_VAR: ${env:MY_ENV_VAR}
+    # events:
+    #   - http:
+    #       path: hello
+    #       method: get
+    url:
+      authType: NONE # Set auth type to NONE for public access
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PstashQueue
+              - Arn
+          batchSize: 10 # Optional: Adjust the batch size as needed
+
+package:
+  individually: true
+
+plugins:
+  - serverless-plugin-typescript
+  # - serverless-dotenv-plugin
+
+resources:
+  Resources:
+    PstashQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: pStash-q
+
+    # Optional: Add a Dead Letter Queue (DLQ)
+    PstashDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: pstash-dlq
+
+    # Optional: Lambda function permissions for the DLQ
+    LambdaFunctionPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !Ref pstash
+        Action: lambda:InvokeFunction
+        Principal: sqs.amazonaws.com
+        SourceArn: !GetAtt PstashQueue.Arn
